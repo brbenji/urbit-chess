@@ -11,15 +11,9 @@ export function Settings () {
   const hasGame: boolean = (displayGame !== null)
 
   const handleCheckboxChange = async () => {
-<<<<<<< HEAD
-    const newAutoClaimPreference = !displayGame.autoClaimSpecialDraws
-    const gameID = displayGame.info.gameID
-    await pokeAction(urbit, changeSpecialDrawPreferencePoke(gameID, newAutoClaimPreference))
-=======
     const newAutoClaimPreference = !(displayGame as ActiveGameInfo).autoClaimSpecialDraws
     const gameID = displayGame.gameID
-    await pokeAction(urbit, changeSpecialDrawPreference(gameID, newAutoClaimPreference))
->>>>>>> d482aad (add functionality for browsing completed games)
+    await pokeAction(urbit, changeSpecialDrawPreferencePoke(gameID, newAutoClaimPreference))
   }
 
   return (

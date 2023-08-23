@@ -583,7 +583,7 @@
             :~  :*  %give
                     %fact
                     ~[/active-games]
-                    %chess-game
+                    %chess-game-active
                     !>(new-game)
                 ==
                 ::  tell our frontend our challenge was accepted

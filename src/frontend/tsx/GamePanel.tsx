@@ -9,114 +9,67 @@ import { Ship, Side, GameID, SAN, GameInfo, ActiveGameInfo } from '../ts/types/u
 export function GamePanel () {
   const { urbit, displayGame, setDisplayGame, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex } = useChessStore()
   const hasGame: boolean = (displayGame !== null)
-<<<<<<< HEAD
-  const practiceHasMoved: boolean = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
-  const opponent: Ship = !hasGame ? '~sampel-palnet' : (urbit.ship === displayGame.info.white.substring(1))
-    ? displayGame.info.black
-    : displayGame.info.white
-  const canWeUndo: boolean = (displayGame.info.moves.length >= 2)
-    ? true
-    : (urbit.ship === displayGame.info.white.substring(1) && displayGame.info.moves.length >= 1)
-=======
   const activeGame: boolean = hasGame && !(displayGame.archived)
-  const practiceHasMoved = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
-  const opponent = !hasGame ? '~sampel-palnet' : (urbit.ship === displayGame.white.substring(1))
+  const practiceHasMoved: boolean = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
+  const opponent: Ship = !hasGame ? '~sampel-palnet' : (urbit.ship === displayGame.white.substring(1))
     ? displayGame.black
     : displayGame.white
->>>>>>> d482aad (add functionality for browsing completed games)
+  const canWeUndo: boolean = (displayGame.moves.length >= 2)
+    ? true
+    : (urbit.ship === displayGame.white.substring(1) && displayGame.moves.length >= 1)
 
   //
   // HTML element helper functions
   //
 
   const resignOnClick = async () => {
-<<<<<<< HEAD
-    const gameID = displayGame.info.gameID
+    const gameID = displayGame.gameID
     await pokeAction(urbit, resignPoke(gameID))
   }
 
   const offerDrawOnClick = async () => {
-    const gameID = displayGame.info.gameID
+    const gameID = displayGame.gameID
     await pokeAction(urbit, offerDrawPoke(gameID))
   }
 
   const acceptDrawOnClick = async () => {
-    const gameID = displayGame.info.gameID
+    const gameID = displayGame.gameID
     await pokeAction(urbit, acceptDrawPoke(gameID))
   }
 
   const declineDrawOnClick = async () => {
-    const gameID = displayGame.info.gameID
+    const gameID = displayGame.gameID
     await pokeAction(urbit, declineDrawPoke(gameID))
   }
 
   const revokeDrawOnClick = async () => {
-    const gameID = displayGame.info.gameID
+    const gameID = displayGame.gameID
     await pokeAction(urbit, revokeDrawPoke(gameID))
   }
 
   const claimSpecialDrawOnClick = async () => {
-    const gameID = displayGame.info.gameID
+    const gameID = displayGame.gameID
     await pokeAction(urbit, claimSpecialDrawPoke(gameID))
   }
 
   const requestUndoOnClick = async () => {
-    const gameID = displayGame.info.gameID
+    const gameID = displayGame.gameID
     await pokeAction(urbit, requestUndoPoke(gameID))
   }
 
   const acceptUndoOnClick = async () => {
-    const gameID = displayGame.info.gameID
+    const gameID = displayGame.gameID
     await pokeAction(urbit, acceptUndoPoke(gameID))
   }
 
   const declineUndoOnClick = async () => {
-    const gameID = displayGame.info.gameID
+    const gameID = displayGame.gameID
     await pokeAction(urbit, declineUndoPoke(gameID))
   }
 
   const revokeUndoOnClick = async () => {
-    const gameID = displayGame.info.gameID
+    const gameID = displayGame.gameID
     await pokeAction(urbit, revokeUndoPoke(gameID))
-=======
-    const gameID = displayGame.gameID
-    await pokeAction(urbit, resign(gameID))
-  }
-
-  const offerDrawOnClick = async () => {
-    const gameID = displayGame.gameID
-    await pokeAction(urbit, offerDraw(gameID), null, () => { offeredDraw(gameID) })
-  }
-
-  const acceptDrawOnClick = async () => {
-    const gameID = displayGame.gameID
-    await pokeAction(urbit, acceptDraw(gameID))
-  }
-
-  const declineDrawOnClick = async () => {
-    const gameID = displayGame.gameID
-    await pokeAction(urbit, declineDraw(gameID), null, () => { declinedDraw(gameID) })
-  }
-
-  const claimSpecialDrawOnClick = async () => {
-    const gameID = displayGame.gameID
-    await pokeAction(urbit, claimSpecialDraw(gameID))
-  }
-
-  const requestUndoOnClick = async () => {
-    const gameID = displayGame.gameID
-    await pokeAction(urbit, requestUndo(gameID), null, () => { requestedUndo(gameID) })
-  }
-
-  const acceptUndoOnClick = async () => {
-    const gameID = displayGame.gameID
-    await pokeAction(urbit, acceptUndo(gameID))
-  }
-
-  const declineUndoOnClick = async () => {
-    const gameID = displayGame.gameID
-    await pokeAction(urbit, declineUndo(gameID), null, () => { declinedUndo(gameID) })
->>>>>>> d482aad (add functionality for browsing completed games)
   }
 
   const moveOpacity = (index: number) => {
@@ -227,27 +180,14 @@ export function GamePanel () {
           disabled={!activeGame}
           onClick={resignOnClick}>
           Resign</button>
-<<<<<<< HEAD
         {/* offer/revoke/accept draw button */}
-        {(!displayGame.gotDrawOffer && !displayGame.sentDrawOffer)
-          ? <button
-            className='option'
-            disabled={!hasGame}
-=======
-        {/* offer/accept draw button */}
-        {(displayGame as ActiveGameInfo).gotDrawOffer
+        {(!(displayGame as ActiveGameInfo).gotDrawOffer && !(displayGame as ActiveGameInfo).sentDrawOffer)
           ? <button
             className='option'
             disabled={!activeGame}
-            onClick={acceptDrawOnClick}>
-            Accept Draw Offer</button>
-          : <button
-            className='option'
-            disabled={!activeGame || (displayGame as ActiveGameInfo).sentDrawOffer}
->>>>>>> d482aad (add functionality for browsing completed games)
             onClick={offerDrawOnClick}>
             Send Draw Offer</button>
-          : (displayGame.gotDrawOffer
+          : ((displayGame as ActiveGameInfo).gotDrawOffer
             ? <button
               className='option'
               onClick={acceptDrawOnClick}>
@@ -264,37 +204,24 @@ export function GamePanel () {
           disabled={!activeGame || !(displayGame as ActiveGameInfo).drawClaimAvailable}
           onClick={claimSpecialDrawOnClick}>
           Claim Special Draw</button>
-<<<<<<< HEAD
         {/* request/revoke/accept undo button */}
-        {displayGame.gotUndoRequest
-=======
-        {/* request/accept undo button */}
         {(displayGame as ActiveGameInfo).gotUndoRequest
->>>>>>> d482aad (add functionality for browsing completed games)
           ? <button
             className='option'
             disabled={!activeGame}
             onClick={acceptUndoOnClick}>
             Accept Undo Request</button>
-<<<<<<< HEAD
-          : (displayGame.sentUndoRequest
+          : ((displayGame as ActiveGameInfo).sentUndoRequest
             ? <button
               className='option'
               onClick={revokeUndoOnClick}>
               Revoke Undo Request</button>
             : <button
               className='option'
-              disabled={!hasGame || !canWeUndo}
+              disabled={!activeGame || !canWeUndo}
               onClick={requestUndoOnClick}>
               Request to Undo Move</button>
           )
-=======
-          : <button
-            className='option'
-            disabled={!activeGame || (displayGame as ActiveGameInfo).sentUndoRequest}
-            onClick={requestUndoOnClick}>
-            Request to Undo Move</button>
->>>>>>> d482aad (add functionality for browsing completed games)
         }
         {/* (reset) practice board */}
         {hasGame
