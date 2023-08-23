@@ -10,10 +10,15 @@ import '../css/graphics.css'
 import '../css/textboxes.css'
 import '../css/responsive.css'
 import '../css/chessground.css'
+<<<<<<< HEAD
 // Import Chessground style sheets
 import '../css/dependencies/chessground.base.css'
 // Handles piece highlighting
 import '../css/dependencies/chessground.highlight.css'
+=======
+import '../css/dependencies/chessground.base.css' // Import Chessground style sheets
+import '../css/dependencies/chessground.highlight.css' // Handles piece highlighting
+>>>>>>> d482aad (add functionality for browsing completed games)
 import { createRoot } from 'react-dom/client'
 import App from './App'
 

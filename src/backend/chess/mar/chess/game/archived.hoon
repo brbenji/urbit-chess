@@ -1,4 +1,4 @@
-/-  *chess
+/-  chess
 /+  chess
 =,  format
 |_  game=chess-game:chess
@@ -16,6 +16,8 @@
         ['white' [%s (scot %p white.game)]]
         ['black' [%s (scot %p black.game)]]
         ['result' [%s ?~(result.game '' u.result.game)]]
+        ['archived' [%b %.y]]
+        ::  default value. updated thru [%x %game @ta %moves ~] scry.
         ['moves' [%a ~]]
     ==
   --

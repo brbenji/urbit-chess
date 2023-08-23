@@ -1,5 +1,5 @@
 import Urbit from '@urbit/http-api'
-import { Side, CastleSide, PromotionRole, Action, MoveActionAction, Rank, File, Ship, GameID, ChessAction, ChessChallengeAction, ChessSendChallengeAction, ChessDeclineChallengeAction, ChessAcceptChallengeAction, ChessGameAction, ResignAction, OfferDrawAction, RevokeDrawAction, DeclineDrawAction, AcceptDrawAction, ClaimSpecialDrawAction, RequestUndoAction, DeclineUndoAction, AcceptUndoAction, RevokeUndoAction, MoveAction, CastleAction, ChangeSpecialDrawPreferenceAction } from '../types/urbitChess'
+import { Side, CastleSide, PromotionRole, Action, Move, MoveActionAction, Rank, File, Ship, GameID, ChessAction, ChessChallengeAction, ChessSendChallengeAction, ChessDeclineChallengeAction, ChessAcceptChallengeAction, ChessGameAction, ResignAction, OfferDrawAction, RevokeDrawAction, DeclineDrawAction, AcceptDrawAction, ClaimSpecialDrawAction, RequestUndoAction, DeclineUndoAction, AcceptUndoAction, RevokeUndoAction, MoveAction, CastleAction, ChangeSpecialDrawPreferenceAction } from '../types/urbitChess'
 
 //
 // Eyre actions
@@ -172,4 +172,9 @@ export const findFriends = async (app: string, path: string) => {
   const scryOutput: { friends: Array<Ship> } = JSON.parse(JSON.stringify(await scryAction(app, path), null, 2))
 
   return scryOutput.friends
+}
+
+export const scryMoves = async (app: string, path: string) => {
+  const scryOutput: { moves: Array<Move> } = JSON.parse(JSON.stringify(await scryAction(app, path), null, 2))
+  return scryOutput.moves
 }

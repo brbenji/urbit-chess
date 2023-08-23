@@ -29,12 +29,13 @@
   $:  %1
       games=(map game-id active-game-state)
       potential-states=(map game-id (list (pair active-game-state card)))
-      archive=(map game-id chess-game)
+      archive=((mop game-id chess-game) gth)
       challenges-sent=(map ship chess-challenge)
       challenges-received=(map ship chess-challenge)
       rng-state=(map ship chess-commitment)
   ==
 +$  card  card:agent:gall
+++  arch-orm  ((on game-id chess-game) gth)
 --
 %-  agent:dbug
 =|  state-1
@@ -885,7 +886,7 @@
               ::  remove game from our map of active games
               games    (~(del by games) game-id.action)
               ::  add game to our archive
-              archive  (~(put by archive) game-id.action archived-game)
+              archive  (put:arch-orm archive game-id.action archived-game)
             ==
           --
       ==
@@ -1055,7 +1056,7 @@
           ==
       ~
     ::
-    ::  convert active games to chess-game marks for subscribers
+    ::  convert active games to chess-game-active marks for subscribers
     [%active-games ~]
       ?>  =(our.bowl src.bowl)
       :_  this
@@ -1065,7 +1066,21 @@
       :*  %give
           %fact
           ~
-          %chess-game
+          %chess-game-active
+          !>(game)
+      ==
+    ::
+    ::  convert archived games to chess-game-archived marks for frontend
+    [%archived-games ~]
+      ?>  (team:title our.bowl src.bowl)
+      :_  this
+      %+  turn  (tap:arch-orm archive)
+      |=  [key=game-id game=chess-game]
+      ^-  card
+      :*  %give
+          %fact
+          ~
+          %chess-game-archived
           !>(game)
       ==
     ::
@@ -1128,18 +1143,30 @@
       ?~  active-game
         =/  archived-game  (~(get by archive) u.game-id)
         ?~  archived-game  ~
-        ``[%chess-game !>(u.archived-game)]
-      ``[%chess-game !>(game.u.active-game)]
+        ``[%chess-game-archived !>(u.archived-game)]
+      ``[%chess-game-active !>(game.u.active-game)]
+    ::
+    ::  .^(noun %gx /=chess=/game/~1996.2.16..10.00.00..0000/moves/noun)
+    ::  list moves of chess-game for browsing
+      [%x %game @ta %moves ~]
+    =/  game-id  `(unit @dau)`(slaw %da i.t.t.path)
+    ?~  game-id  `~
+    =/  active-game  (~(get by games) u.game-id)
+    ?~  active-game
+      =/  archived-game  (get:arch-orm archive u.game-id)
+      ?~  archived-game  ~
+      ``[%chess-moves !>(u.archived-game)]
+    ``[%chess-moves !>(game.u.active-game)]
     ::
     ::  .^(noun %gx /=chess=/challenges/outgoing/noun)
     ::  list challenges sent
-    [%x %challenges %outgoing ~]
-      ``[%chess-challenges !>(~(tap by challenges-sent))]
+      [%x %challenges %outgoing ~]
+    ``[%chess-challenges !>(~(tap by challenges-sent))]
     ::
     ::  .^(noun %gx /=chess=/challenges/incoming/noun)
     ::  list challenges received
-    [%x %challenges %incoming ~]
-      ``[%chess-challenges !>(~(tap by challenges-received))]
+      [%x %challenges %incoming ~]
+    ``[%chess-challenges !>(~(tap by challenges-received))]
     ::
     ::  .^(arch %gy /=chess=/games)
     ::  collect all the game-id keys
@@ -1214,7 +1241,7 @@
             :~  :*  %give
                     %fact
                     ~[/active-games]
-                    %chess-game
+                    %chess-game-active
                     !>(new-game)
                 ==
                 ::  tell our frontend we accepted the challenge

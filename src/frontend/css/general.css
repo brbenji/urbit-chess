@@ -155,7 +155,7 @@ div.game-container {
   justify-content: center;
 }
 
-div.turn-container {
+div.info-container {
   grid-area: bottom;
   height: calc(max(10vh, 72px) - max(min(2vh, 2vw), 14px));
   width: 100%;
@@ -164,7 +164,7 @@ div.turn-container {
   justify-items: center;
 }
 
-p.turn-text {
+p.info-text {
   font-size: max(4.4vh, 42px);
 }
 

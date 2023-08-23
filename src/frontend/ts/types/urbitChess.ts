@@ -104,34 +104,37 @@ export type SAN = string
 
 export type FENPosition = string
 
-export type Move = {
+export interface Move {
   from: CgKey
   to: CgKey
   san: SAN
   fen: FENPosition
 }
 
-export type GameInfo = {
+export interface GameInfo {
   gameID: GameID,
   event: string,
   white: Ship,
   black: Ship,
-  result: Result,
+  archived: boolean,
   moves: Array<Move>
 }
 
-export type ActiveGameInfo = {
+export interface ActiveGameInfo extends GameInfo {
   position: FENPosition,
   gotDrawOffer: boolean,
   sentDrawOffer: boolean,
   drawClaimAvailable: boolean,
   autoClaimSpecialDraws: boolean,
   gotUndoRequest: boolean,
-  sentUndoRequest: boolean,
-  info: GameInfo
+  sentUndoRequest: boolean
 }
 
-export type Challenge = {
+export interface ArchivedGameInfo extends GameInfo {
+  result: Result
+}
+
+export interface Challenge {
   who: Ship,
   challengerSide: Side,
   event: string
