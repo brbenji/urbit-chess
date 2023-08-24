@@ -5,7 +5,7 @@
 ::
 ::  import libraries and expose namespace
 /-  *historic
-/+  *chess, dbug, default-agent, pals
+/+  *chess, dbug, default-agent, pals, verb
 ::
 ::  define state structures
 |%
@@ -37,7 +37,9 @@
 +$  card  card:agent:gall
 ++  arch-orm  ((on game-id chess-game) gth)
 --
+
 %-  agent:dbug
+%+  verb  &
 =|  state-1
 =*  state  -
 ^-  agent:gall
@@ -869,8 +871,15 @@
           ++  output-quip
             |=  archived-game=chess-game
             :-
-              ::  Update observers with game result
+              ::  update frontend of a new archive
               :~  :*  %give
+                      %fact
+                      ~[/archived-games]
+                      %chess-game-archived
+                      !>(archived-game)
+                  ==
+                  ::  Update observers with game result
+                  :*  %give
                       %fact
                       ~[/game/(scot %da game-id.action)/updates]
                       %chess-update
@@ -1141,7 +1150,7 @@
       ?~  game-id  `~
       =/  active-game  (~(get by games) u.game-id)
       ?~  active-game
-        =/  archived-game  (~(get by archive) u.game-id)
+        =/  archived-game  (get:arch-orm archive u.game-id)
         ?~  archived-game  ~
         ``[%chess-game-archived !>(u.archived-game)]
       ``[%chess-game-active !>(game.u.active-game)]
@@ -1398,10 +1407,19 @@
           =/  =game-id  (slav %da i.t.t.wire)
           =/  game-state
             ^-  active-game-state
+            ::  XX: if you play yourself this code is reached twice
+            ::  for the same game-id. the second time it crashes here
             (~(got by games) game-id)
           :-
-            ::  update observers that game ended
+            ::  update frontend of a new archive
             :~  :*  %give
+                    %fact
+                    ~[/archived-games]
+                    %chess-game-archived
+                    !>(game.game-state(result `result))
+                ==
+                ::  update observers that game ended
+                :*  %give
                     %fact
                     ~[/game/(scot %da game-id)/updates]
                     %chess-update
@@ -1417,7 +1435,7 @@
             ::  remove this game from our map of active games
             games    (~(del by games) game-id)
             ::  add this game to our archive
-            archive  (~(put by archive) game-id game.game-state(result `result))
+            archive  (put:arch-orm archive game-id game.game-state(result `result))
           ==
         ?~  p.sign
           agent-state
