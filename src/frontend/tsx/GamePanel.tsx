@@ -153,23 +153,23 @@ export function GamePanel () {
   }
 
   return (
-    <div className='game-panel-container col' style={{ display: ((displayGame !== null) ? 'flex' : ' none') }}>
+    <div className='game-panel-container col' style={{ display: 'flex' }}>
       <div className="game-panel col">
-        <div id="opp-timer" className={'timer row'}>
+        <div id="opp-timer" className='timer row'>
           <p>00:00</p>
         </div>
-        <div id="opp-player" className={'player row'}>
+        <div id="opp-player" className='player row'>
           <p>{opponent}</p>
         </div>
-        <div className={'moves col'}>
+        <div className='moves col'>
           <ol>
             { moveList() }
           </ol>
         </div>
-        <div id="our-player" className={'player row'}>
+        <div id="our-player" className='player row'>
           <p>~{window.ship}</p>
         </div>
-        <div id="our-timer" className={'timer row'}>
+        <div id="our-timer" className='timer row'>
           <p>00:00</p>
         </div>
         {/* buttons */}
