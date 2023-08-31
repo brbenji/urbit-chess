@@ -101,7 +101,6 @@ const useChessStore = create<ChessState>((set, get) => ({
       set(state => ({ archivedGames: state.archivedGames.set(gameID, archivedGame) }))
     }
   },
-  //  XX:  could this be moved into /helpers/urbitChess?
   displayArchivedGame: async (gameID: GameID) => {
     const currentGame = get().archivedGames.get(gameID)
 
@@ -113,8 +112,7 @@ const useChessStore = create<ChessState>((set, get) => ({
     await get().fetchArchivedMoves(gameID)
     get().setDisplayGame(get().archivedGames.get(gameID))
   },
-  //  XX: BIG CHANGE? converted this to async to scry for archivedGameMoves
-  receiveGameUpdate: async (data: ChessUpdate) => {
+  receiveGameUpdate: (data: ChessUpdate) => {
     const updateDisplayGame = (updatedGame: ActiveGameInfo) => {
       const displayGame = get().displayGame
       if ((displayGame !== null) && (updatedGame.gameID === displayGame.gameID)) {
@@ -162,23 +160,10 @@ const useChessStore = create<ChessState>((set, get) => ({
         //  ordering of cards coming from %chess
         const archivedGame = get().archivedGames.get(gameID)
 
-        //  XX: the currentGame.moves doesn't actually include the check-mate
-        //  move. so it's -1 on the array. it must be that the move data from
-        //  a chess-agent-poke isn't getting to the frontend.
-        //
-        //  how do we solve this?
-        //  we can just scry for the moves of the archive. it might not be
-        //  snappy but it's better than losing the final move.
-        //
-        //  XX: oddly now with the scry in place the winner doesn't
-        //  receive this final move, but the loser does.
-
-        var movesData = await scryMoves('chess', '/game/' + gameID + '/moves')
-
         //  copy moves to archived version before deleting
         const updatedGame: ArchivedGameInfo = {
           ...archivedGame,
-          moves: movesData
+          moves: currentGame.moves
         }
 
         var activeGames: Map<GameID, ActiveGameInfo> = get().activeGames
