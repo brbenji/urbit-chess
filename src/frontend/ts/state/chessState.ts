@@ -23,8 +23,8 @@ interface ChessState {
   // backend update functions
   receiveChallengeUpdate: (data: ChallengeUpdate) => void
   receiveActiveGame: (data: ActiveGameInfo) => void
-  receiveGameUpdate: (data: ChessUpdate) => void
   receiveArchivedGame: (data: ArchivedGameInfo) => void
+  receiveGameUpdate: (data: ChessUpdate) => void
 }
 
 export default ChessState

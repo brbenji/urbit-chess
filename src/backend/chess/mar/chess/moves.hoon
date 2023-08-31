@@ -7,11 +7,11 @@
 |_  game=chess-game
 ++  grab
   |%
-  ++  noun  chess-game :: XX: ? moves=(list [chess-move chess-fen chess-san])
+  ++  noun  (list [chess-move chess-fen chess-san])
   --
 ++  grow
   |%
-  ++  noun  game  :: XX: ? moves=(list [chess-move chess-fen chess-san])
+  ++  noun  moves.game
   ++  json
     |^
     %-  frond:enjs

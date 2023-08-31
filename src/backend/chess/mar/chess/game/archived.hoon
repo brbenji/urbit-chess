@@ -1,4 +1,3 @@
-/-  *chess
 /+  chess
 =,  format
 |_  game=chess-game:chess

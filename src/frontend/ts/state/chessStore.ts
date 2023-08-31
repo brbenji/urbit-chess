@@ -142,15 +142,13 @@ const useChessStore = create<ChessState>((set, get) => ({
             position: move.fen,
             drawClaimAvailable: positionData.specialDrawAvailable
           }
-          /* Math.max() gives a zero default in case currentGame moves is null */
+          // Math.max() gives a zero default in case currentGame moves is null
           const newIndex: number = Math.max(currentGame.moves.length - 1, 0)
 
           set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame), displayIndex: newIndex }))
           updateDisplayGame(updatedGame)
 
           console.log('RECEIVED POSITION UPDATE FOR ' + gameID)
-          console.log('Update.Position displayIndex: ' + (get().displayIndex))
-          console.log('Update.Position fen: ' + move.fen)
         }
 
         break
@@ -188,10 +186,6 @@ const useChessStore = create<ChessState>((set, get) => ({
 
         set(state => ({
           activeGames: activeGames,
-          //  XX: I don't think this is what we want.
-          //  isn't this an anti pattern?
-          //  consider letting the archivedGame just be, it already
-          //  exists in the state map.
           archivedGames: state.archivedGames.set(gameID, updatedGame)
         }))
 
@@ -334,7 +328,7 @@ const useChessStore = create<ChessState>((set, get) => ({
           gotUndoRequest: false,
           sentUndoRequest: false
         }
-        /* Math.max() gives a zero default in case currentGame moves is null */
+        // Math.max() gives a zero default in case currentGame moves is null
         const newIndex: number = Math.max(currentGame.moves.length - 1, 0)
 
         set(state => ({ activeGames: state.activeGames.set(gameID, updatedGame), displayIndex: newIndex }))

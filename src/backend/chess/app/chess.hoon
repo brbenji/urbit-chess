@@ -5,7 +5,7 @@
 ::
 ::  import libraries and expose namespace
 /-  *historic
-/+  *chess, dbug, default-agent, pals, verb
+/+  *chess, dbug, default-agent, pals
 ::
 ::  define state structures
 |%
@@ -39,7 +39,6 @@
 --
 
 %-  agent:dbug
-%+  verb  &
 =|  state-1
 =*  state  -
 ^-  agent:gall
@@ -871,14 +870,13 @@
           ++  output-quip
             |=  archived-game=chess-game
             :-
-              ::  update frontend of a new archive
+              ::  Update observers with game result
               :~  :*  %give
                       %fact
                       ~[/archived-games]
                       %chess-game-archived
                       !>(archived-game)
                   ==
-                  ::  Update observers with game result
                   :*  %give
                       %fact
                       ~[/game/(scot %da game-id.action)/updates]
@@ -1145,20 +1143,20 @@
     ::  .^(noun %gx /=chess=/game/~1996.2.16..10.00.00..0000/noun)
     ::  read game info
     ::  either active or archived
-    [%x %game @ta ~]
-      =/  game-id  `(unit game-id)`(slaw %da i.t.t.path)
-      ?~  game-id  `~
-      =/  active-game  (~(get by games) u.game-id)
-      ?~  active-game
-        =/  archived-game  (get:arch-orm archive u.game-id)
-        ?~  archived-game  ~
-        ``[%chess-game-archived !>(u.archived-game)]
-      ``[%chess-game-active !>(game.u.active-game)]
+      [%x %game @ta ~]
+    =/  game-id  `(unit game-id)`(slaw %da i.t.t.path)
+    ?~  game-id  `~
+    =/  active-game  (~(get by games) u.game-id)
+    ?~  active-game
+      =/  archived-game  (get:arch-orm archive u.game-id)
+      ?~  archived-game  ~
+      ``[%chess-game-archived !>(u.archived-game)]
+    ``[%chess-game-active !>(game.u.active-game)]
     ::
     ::  .^(noun %gx /=chess=/game/~1996.2.16..10.00.00..0000/moves/noun)
     ::  list moves of chess-game for browsing
       [%x %game @ta %moves ~]
-    =/  game-id  `(unit @dau)`(slaw %da i.t.t.path)
+    =/  game-id  `(unit game-id)`(slaw %da i.t.t.path)
     ?~  game-id  `~
     =/  active-game  (~(get by games) u.game-id)
     ?~  active-game
@@ -1179,17 +1177,17 @@
     ::
     ::  .^(arch %gy /=chess=/games)
     ::  collect all the game-id keys
-    [%y %games ~]
-      :-  ~  :-  ~
-      :-  %arch
-      !>  ^-  arch
-      :-  ~
-      =/  ids  ~(tap in (~(uni in ~(key by archive)) ~(key by games)))
-      %-  malt
-      ^-  (list [@ta ~])
-      %+  turn  ids
-      |=  a=game-id
-      [(scot %da a) ~]
+      [%y %games ~]
+    :-  ~  :-  ~
+    :-  %arch
+    !>  ^-  arch
+    :-  ~
+    =/  ids  ~(tap in (~(uni in ~(key by archive)) ~(key by games)))
+    %-  malt
+    ^-  (list [@ta ~])
+    %+  turn  ids
+    |=  a=game-id
+    [(scot %da a) ~]
     ::
     ::  .^(noun %gx /=chess=/friends/noun)
     ::  .^(json %gx /=chess=/friends/json)
@@ -1197,8 +1195,8 @@
     ::
     ::  XX: peek-bad-result if %pals not installed
     ::      should check %pals exists on this ship first
-    [%x %friends ~]
-      ``[%chess-pals !>((~(mutuals pals bowl) ~.))]
+      [%x %friends ~]
+    ``[%chess-pals !>((~(mutuals pals bowl) ~.))]
   ==
 ++  on-agent
   |=  [=wire =sign:agent:gall]
@@ -1407,18 +1405,17 @@
           =/  =game-id  (slav %da i.t.t.wire)
           =/  game-state
             ^-  active-game-state
-            ::  XX: if you play yourself this code is reached twice
-            ::  for the same game-id. the second time it crashes here
             (~(got by games) game-id)
+          =*  updated-game  game.game-state
+          =.  result.updated-game  `result
           :-
-            ::  update frontend of a new archive
+            ::  update observers that game ended
             :~  :*  %give
                     %fact
                     ~[/archived-games]
                     %chess-game-archived
-                    !>(game.game-state(result `result))
+                    !>(updated-game)
                 ==
-                ::  update observers that game ended
                 :*  %give
                     %fact
                     ~[/game/(scot %da game-id)/updates]
@@ -1435,7 +1432,7 @@
             ::  remove this game from our map of active games
             games    (~(del by games) game-id)
             ::  add this game to our archive
-            archive  (put:arch-orm archive game-id game.game-state(result `result))
+            archive  (put:arch-orm archive game-id updated-game)
           ==
         ?~  p.sign
           agent-state
