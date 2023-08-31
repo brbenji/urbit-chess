@@ -2,7 +2,7 @@ import create from 'zustand'
 import Urbit from '@urbit/http-api'
 import { CHESS } from '../constants/chess'
 import { Action, Update, Ship, GameID, GameInfo, ActiveGameInfo, ArchivedGameInfo, Challenge, ChessUpdate, ChallengeUpdate, ChallengeSentUpdate, ChallengeReceivedUpdate, PositionUpdate, ResultUpdate, DrawUpdate, SpecialDrawPreferenceUpdate, UndoUpdate, UndoAcceptedUpdate } from '../types/urbitChess'
-import { findFriends, scryMoves } from '../helpers/urbitChess'
+import { scryFriends, scryMoves } from '../helpers/urbitChess'
 import ChessState from './chessState'
 
 // TODO: should log which function was called with the bad ID

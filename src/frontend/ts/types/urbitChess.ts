@@ -104,12 +104,30 @@ export type SAN = string
 
 export type FENPosition = string
 
+/**
+ * Interfaces
+ */
+
+//
+// Generic
+//
+
 export interface Move {
   from: CgKey
   to: CgKey
   san: SAN
   fen: FENPosition
 }
+
+export interface Challenge {
+  who: Ship,
+  challengerSide: Side,
+  event: string
+}
+
+//
+// Game Info
+//
 
 export interface GameInfo {
   gameID: GameID,
@@ -133,19 +151,6 @@ export interface ActiveGameInfo extends GameInfo {
 export interface ArchivedGameInfo extends GameInfo {
   result: Result
 }
-
-export interface Challenge {
-  who: Ship,
-  challengerSide: Side,
-  event: string
-}
-
-/**
- * Interfaces
- */
-
-//  XX: types and interfaces are almost identical in TS, as of 2019
-//      should just choose one and use it everywhere
 
 //
 // Updates

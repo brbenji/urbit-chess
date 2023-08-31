@@ -8,7 +8,7 @@ import { Ship, Side, GameID, SAN, GameInfo, ActiveGameInfo } from '../ts/types/u
 
 export function GamePanel () {
   const { urbit, displayGame, setDisplayGame, practiceBoard, setPracticeBoard, displayIndex, setDisplayIndex } = useChessStore()
-  const hasActiveGame: boolean = !(displayGame.archived)
+  const hasActiveGame: boolean = !displayGame.archived
   const practiceHasMoved: boolean = (localStorage.getItem('practiceBoard') !== CHESS.defaultFEN)
   const opponent: Ship = (urbit.ship === displayGame.white.substring(1))
     ? displayGame.black
@@ -186,7 +186,7 @@ export function GamePanel () {
             disabled={!hasActiveGame}
             onClick={offerDrawOnClick}>
             Send Draw Offer</button>
-          : ((displayGame as ActiveGameInfo).gotDrawOffer
+          : ((displayGame as ActiveGameInfo).gotDrawOffer)
             ? <button
               className='option'
               onClick={acceptDrawOnClick}>
@@ -195,7 +195,6 @@ export function GamePanel () {
               className='option'
               onClick={revokeDrawOnClick}>
               Revoke Draw Offer</button> // revoke
-          )
         }
         {/* claim special draw */}
         <button

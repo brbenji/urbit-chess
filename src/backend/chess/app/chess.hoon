@@ -167,9 +167,13 @@
             ?:  =(our.bowl white.game.u.game-state)
               %'0-1'
             %'1-0'
-          :_  this
           ::  resign
           ::  handle our end on ack
+          :_
+            %=  this
+              ::  reset potential states on resignation
+              potential-states  (~(put by potential-states) game-id.action ~)
+            ==
           :~  :*  %pass
                   /poke/game/(scot %da game-id.action)/ended/[result]
                   %agent
@@ -276,7 +280,11 @@
             "no draw offer to accept for game {<game-id.action>}"
           ::  tell opponent we accept the draw
           ::  handle our end on ack
-          :_  this
+          :_
+            %=  this
+              ::  reset potential states on draw
+              potential-states  (~(put by potential-states) game-id.action ~)
+            ==
           :~  :*  %pass
                   /poke/game/(scot %da game-id.action)/ended/[%'½–½']
                   %agent
@@ -305,7 +313,11 @@
             "no special draw available for game {<game-id.action>}"
           ::  tell opponent we claim a special conditions draw
           ::  handle our end on ack
-          :_  this
+          :_
+            %=  this
+              ::  reset potential states on draw
+              potential-states  (~(put by potential-states) game-id.action ~)
+            ==
           :~  :*  %pass
                   /poke/game/(scot %da game-id.action)/ended/[%'½–½']
                   %agent
@@ -455,7 +467,11 @@
           =/  move-result  (do-move u.game-state move.action)
           ::  reject invalid moves
           ?~  move-result
-            %+  poke-nack  this
+            %+  poke-nack
+              %=  this
+                ::  reset potential states after invalid move
+                potential-states  (~(put by potential-states) game-id.action ~)
+              ==
             "invalid move for game {<game-id.action>}"
           =*  new-game-state  new.u.move-result
           ::  handle our end on ack
@@ -831,7 +847,7 @@
                 ?:  ?|  sent-draw-offer.u.game-state
                         special-draw-available.u.game-state
                     ==
-                  (output-quip game.u.game-state(result `result.action))
+                  (output-quip game.u.game-state(result `result.action) ~)
                 %+  poke-nack  this
                 "{<our.bowl>} did not send draw offer for {<game-id.action>}"
               ::  is opponent resigning?
@@ -839,7 +855,7 @@
                   ?:  =(our.bowl white.game.u.game-state)
                     %'1-0'
                   %'0-1'
-                (output-quip game.u.game-state(result `result.action))
+                (output-quip game.u.game-state(result `result.action) ~)
               %+  poke-nack  this
               "{<our.bowl>} does not resign game {<game-id.action>}"
             ::  apply move
@@ -853,7 +869,7 @@
             ?:  =(result.action %'½–½')
               ::  is a draw now available?
               ?:  special-draw-available.result-game-state
-                (output-quip game.result-game-state(result `result.action))
+                (output-quip game.result-game-state(result `result.action) (bind move-result tail))
               =/  san  (~(algebraicize with-position position.u.game-state) u.move.action)
               %+  poke-nack  this
               "no special draw available for game {<game-id.action>} after {<san>}"
@@ -864,37 +880,42 @@
               "move {<san>} does not end game {<game-id.action>}"
             ::  has opponent won?
             ?:  =(result.action u.result.game.result-game-state)
-              (output-quip game.result-game-state)
+              (output-quip game.result-game-state (bind move-result tail))
             %+  poke-nack  this
             "{<src.bowl>} does not win game {<game-id.action>}"
           ++  output-quip
-            |=  archived-game=chess-game
-            :-
-              ::  Update observers with game result
-              :~  :*  %give
-                      %fact
-                      ~[/archived-games]
-                      %chess-game-archived
-                      !>(archived-game)
-                  ==
-                  :*  %give
-                      %fact
-                      ~[/game/(scot %da game-id.action)/updates]
-                      %chess-update
-                      !>([%result game-id.action result.action])
-                  ==
-                  ::  kick subscribers who are listening to this agent
-                  :*  %give
-                      %kick
-                      ~[/game/(scot %da game-id.action)/updates]
-                      ~
-              ==  ==
-            %=  this
-              ::  remove game from our map of active games
-              games    (~(del by games) game-id.action)
-              ::  add game to our archive
-              archive  (put:arch-orm archive game-id.action archived-game)
-            ==
+            |=  [archived-game=chess-game move=(unit card)]
+            :_
+              %=  this
+                ::  remove game from our map of active games
+                games    (~(del by games) game-id.action)
+                ::  add game to our archive
+                archive  (put:arch-orm archive game-id.action archived-game)
+              ==
+            %+  weld
+              ::  send move update, if any
+              (drop move)
+            ::  archive finished game
+            ^-  (list card)
+            :~  :*  %give
+                    %fact
+                    ~[/archived-games]
+                    %chess-game-archived
+                    !>(archived-game)
+                ==
+                ::  update observers with game result
+                :*  %give
+                    %fact
+                    ~[/game/(scot %da game-id.action)/updates]
+                    %chess-update
+                    !>([%result game-id.action result.action])
+                ==
+                ::  kick subscribers who are listening to this agent
+                :*  %give
+                    %kick
+                    ~[/game/(scot %da game-id.action)/updates]
+                    ~
+            ==  ==
           --
       ==
     ::
@@ -1403,37 +1424,44 @@
         =/  agent-state
           =*  result  i.t.t.t.t.wire
           =/  =game-id  (slav %da i.t.t.wire)
-          =/  game-state
-            ^-  active-game-state
-            (~(got by games) game-id)
+          =+
+            ^=  [game-state move]
+            ^-  [active-game-state (unit card)]
+            ?~  states=(~(gut by potential-states) game-id ~)
+              [(~(got by games) game-id) ~]
+            [-.i.states (some +.i.states)]
           =*  updated-game  game.game-state
           =.  result.updated-game  `result
-          :-
-            ::  update observers that game ended
-            :~  :*  %give
-                    %fact
-                    ~[/archived-games]
-                    %chess-game-archived
-                    !>(updated-game)
-                ==
-                :*  %give
-                    %fact
-                    ~[/game/(scot %da game-id)/updates]
-                    %chess-update
-                    !>([%result game-id result])
-                ==
-                ::  and kick subscribers who are listening to this agent
-                :*  %give
-                    %kick
-                    [/game/(scot %da game-id)/updates ~]
-                    ~
-            ==  ==
-          %=  this
-            ::  remove this game from our map of active games
-            games    (~(del by games) game-id)
-            ::  add this game to our archive
-            archive  (put:arch-orm archive game-id updated-game)
-          ==
+          :_
+            %=  this
+              ::  remove this game from our map of active games
+              games    (~(del by games) game-id)
+              ::  add this game to our archive
+              archive  (put:arch-orm archive game-id updated-game)
+            ==
+          %+  weld
+            (drop move)
+          ^-  (list card)
+          ::  archive finished game
+          :~  :*  %give
+                  %fact
+                  ~[/archived-games]
+                  %chess-game-archived
+                  !>(updated-game)
+              ==
+              ::  update observers that game ended
+              :*  %give
+                  %fact
+                  ~[/game/(scot %da game-id)/updates]
+                  %chess-update
+                  !>([%result game-id result])
+              ==
+              ::  and kick subscribers who are listening to this agent
+              :*  %give
+                  %kick
+                  ~[/game/(scot %da game-id)/updates]
+                  ~
+          ==  ==
         ?~  p.sign
           agent-state
         ::  print error if nack, then carry on

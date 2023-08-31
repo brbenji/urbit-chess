@@ -3,7 +3,7 @@ import { Beforeunload } from 'react-beforeunload'
 import Urbit from '@urbit/http-api'
 import useChessStore from '../ts/state/chessStore'
 import { ChallengeUpdate, ActiveGameInfo, ArchivedGameInfo } from '../ts/types/urbitChess'
-import { findFriends } from '../ts/helpers/urbitChess'
+import { scryFriends } from '../ts/helpers/urbitChess'
 import { Chessboard } from './Chessboard'
 import { Menu } from './Menu'
 import { GamePanel } from './GamePanel'
@@ -42,7 +42,7 @@ export function App () {
       quit: () => {}
     })
 
-    setFriends(await findFriends('chess', '/friends'))
+    setFriends(await scryFriends('chess', '/friends'))
   }
 
   const teardown = () => {

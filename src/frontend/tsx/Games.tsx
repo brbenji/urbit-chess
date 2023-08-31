@@ -4,16 +4,14 @@ import useChessStore from '../ts/state/chessStore'
 import usePreferenceStore from '../ts/state/preferenceStore'
 
 export function Games () {
-  // data
   const { urbit, displayGame, activeGames, setDisplayGame, archivedGames, displayArchivedGame } = useChessStore()
   const { pieceTheme } = usePreferenceStore()
   const hasGame: boolean = (displayGame !== null)
+  const [showingActive, setShowingActive] = useState(true)
 
   const extractDate = (gameID: GameID) => {
     return (gameID.split('..')[0]).substring(1)
   }
-  // interface
-  const [showingActive, setShowingActive] = useState(true)
 
   const openActive = () => {
     setShowingActive(true)
