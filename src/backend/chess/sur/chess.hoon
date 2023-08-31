@@ -258,6 +258,10 @@
     ::  result of match (if it's over)
     ::    e.g. 0-1
     result=(unit chess-result)
+    ::  XX: we should probably have a named type
+    ::      for [chess-move chess-fen chess-san].
+    ::      and possibly a type for a list of it.
+    ::
     ::  a list of the moves played, in Urbit, FEN, and SAN notation
     moves=(list [chess-move chess-fen chess-san])
   ==
